@@ -1,7 +1,5 @@
 @import url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css);
 
 #map-container {
-    height: 1000px;
-	width: 1000px;
-	float: right;
+    height: 75vh;
 }
