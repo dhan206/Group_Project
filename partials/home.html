@@ -1,7 +1,54 @@
 <div>
     <!-- TODO: Richard forms-->
-    <form>
-
+    <form name="searchForm" novalidate>
+    	<div class="row">
+			<div class="col-md-4">
+				<label>City</label>
+				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" required>
+			</div>
+			<div class="col-md-4">
+				<label>State</label>
+				<input type="text" class="form-control" name="state" id="state" placeholder="Search a State" required>
+			</div>
+			<div class="col-md-4">
+				<label>Zip Code</label>
+				<input type="text" class="form-control" name="zip" id="zip" placeholder="Search a ZIP Code" required>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Start Date</label>
+				<p class="input-group">
+					<input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateStart" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					</span>
+				</p>
+			</div>
+			<div class="col-md-4">
+				<label>End Date</label>
+				<p class="input-group">
+					<input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateEnd" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+					<span class="input-group-btn">
+						<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+					</span>
+				</p>
+			</div>
+			<div class="col-md-4">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="music">
+						Music
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" value="sports">
+						Sports
+					</label>
+				</div>
+			</div>
+		</div>
     </form>
 </div>
 
