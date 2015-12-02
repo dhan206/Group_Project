@@ -35,7 +35,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 var lon = data.venue.location.lon;
                 var marker = L.circleMarker([lat, lon]);
                 marker.setRadius(5);
-                marker.bindPopup(data.title)
+                var date = new Date(data.datetime_local);
+                marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
                 marker.addTo(map);
             });
         });

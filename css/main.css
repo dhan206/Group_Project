@@ -3,3 +3,8 @@
 #map-container {
     height: 75vh;
 }
+
+.eventTitle {
+	font-family: helvetica;
+	font-size: 36px;
+}
