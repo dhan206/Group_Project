@@ -28,10 +28,17 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
-        $http.get().then(function(response) {
-
+        $http.get("http://api.seatgeek.com/2/events?venue.city=Seattle&datetime_utc.gte=2015-12-01&datetime_utc.lte=2015-12-31&per_page=50").then(function(response) {
+            console.log(response.data.events);
+            angular.forEach(response.data.events, function(data) {
+                var lat = data.venue.location.lat;
+                var lon = data.venue.location.lon;
+                var marker = L.circleMarker([lat, lon]);
+                marker.setRadius(5);
+                marker.bindPopup(data.title)
+                marker.addTo(map);
+            });
         });
-
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
         $scope.today = new Date();
