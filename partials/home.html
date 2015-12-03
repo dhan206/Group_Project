@@ -4,22 +4,22 @@
     	<div class="row">
 			<div class="col-md-4">
 				<label>City</label>
-				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" required>
+				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" ng-model="city" required>
 			</div>
 			<div class="col-md-4">
 				<label>State</label>
-				<input type="text" class="form-control" name="state" id="state" placeholder="Search a State" required>
+				<input type="text" class="form-control" name="state" id="state" placeholder="Search a State" ng-model="state" required>
 			</div>
 			<div class="col-md-4">
 				<label>Zip Code</label>
-				<input type="text" class="form-control" name="zip" id="zip" placeholder="Search a ZIP Code" required>
+				<input type="text" class="form-control" name="zip" id="zip" placeholder="Search a ZIP Code" ng-model="zip" required>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
 				<label>Start Date</label>
 				<p class="input-group">
-					<input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateStart" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+					<input id="startDate" type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateStart" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" ng-model="startDate" />
 					<span class="input-group-btn">
 						<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 					</span>
@@ -28,7 +28,7 @@
 			<div class="col-md-4">
 				<label>End Date</label>
 				<p class="input-group">
-					<input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateEnd" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+					<input id="endDate" type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="dateEnd" is-open="status.isOpen" ng-click="status.isOpen=true" min-date="today" datepicker-options="dateOptions" ng-required="true" close-text="Close" ng-model="endDate" />
 					<span class="input-group-btn">
 						<button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 					</span>
@@ -49,6 +49,7 @@
 				</div>
 			</div>
 		</div>
+		<button id="submitButton" class="btn btn-primary" type="submit" ng-click="submitForm(searchForm)">Search</button>
     </form>
 </div>
 
