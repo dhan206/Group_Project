@@ -20,8 +20,9 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         //the map
         var map = L.map('map-container').setView([37.50, -97.00], 4);
-        var markers = [];
         var url = "http://api.seatgeek.com/2/events?";
+        var layerControl;
+        var typeLayers = {};
 
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -33,21 +34,34 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         function getData(params) {
             $http.get(url + params).then(function(response) {
-                console.log(response.data.events);
-                var typeLayers = {};
-                angular.forEach(response.data.events, function(data) {
+
+                if (layerControl) {
+                    Object.keys(typeLayers).forEach(function (layer) {
+                        layerControl.removeLayer(typeLayers[layer]);
+                        map.removeLayer(typeLayers[layer]);
+                    });
+
+                    layerControl.removeFrom(map);
+
+                    typeLayers = {};
+                }
+
+                response.data.events.forEach(function(data) {
                     var lat = data.venue.location.lat;
                     var lon = data.venue.location.lon;
                     var marker = L.circleMarker([lat, lon]);
                     marker.setRadius(5);
+
                     if (!typeLayers.hasOwnProperty(data.type)) {
                         typeLayers[data.type] = L.layerGroup([]);
                     }
+
                     var date = new Date(data.datetime_local);
                     marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='" + data.url + "'>Seatgeek Listing</a>");
                     marker.addTo(typeLayers[data.type]);
                 });
-                L.control.layers(null, typeLayers).addTo(map);
+                layerControl = L.control.layers(null, typeLayers);
+                layerControl.addTo(map);
             });
         }
 
@@ -107,7 +121,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 var endDate = angular.element(document.getElementById("endDate"))[0].value;
                 query = query + "datetime_utc.lte=" + endDate + "&";
             }
-            query = query + "per_page=50";
+            query = query + "per_page=100";
             console.log(query); 
             getData(query);
         }
