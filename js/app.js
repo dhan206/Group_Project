@@ -39,7 +39,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 var marker = L.circleMarker([lat, lon]);
                 marker.setRadius(5);
                 var date = new Date(data.datetime_local);
-                marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
+                marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
                 marker.addTo(map);
                 markers.push(marker);
             });
@@ -58,7 +58,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     var marker = L.circleMarker([lat, lon]);
                     marker.setRadius(5);
                     var date = new Date(data.datetime_local);
-                    marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
+                    marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
                     marker.addTo(map);
                     markers.push(marker);
                 });
