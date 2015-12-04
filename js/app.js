@@ -19,7 +19,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').setView([37.50, -97.00], 4);
+        var map = L.map('map-container').locate({setView: true, maxZoom: 13});
         var url = "http://api.seatgeek.com/2/events?";
         var layerControl;
         var typeLayers = {};
