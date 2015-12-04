@@ -35,6 +35,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         function getData(params) {
             $http.get(url + params).then(function(response) {
 
+                // removes layer groups and layer control from the map
+                // for each new search
                 if (layerControl) {
                     Object.keys(typeLayers).forEach(function (layer) {
                         layerControl.removeLayer(typeLayers[layer]);
