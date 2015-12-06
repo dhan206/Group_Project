@@ -1,10 +1,40 @@
 @import url(https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css);
 
+body {
+	background-color: cadetblue;
+}
+
+#searchForm {
+	padding: 1em;
+}
+
 #map-container {
     height: 75vh;
 }
 
+#listDiv h2 {
+	text-align: center;
+}
+
+#header {
+	min-height: 150px;
+}
+
 .eventTitle {
-	font-family: helvetica;
+	font-family: helvetica, sans-serif;
 	font-size: 36px;
+}
+
+@media screen and (min-width: 768px) {
+
+	#listDiv {
+		width: 25vw;
+		min-height: 90vh;
+		float: left;
+	}
+
+	#map-container {
+		height: 90vh;
+	}
+
 }

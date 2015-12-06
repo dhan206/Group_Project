@@ -1,4 +1,4 @@
-<div>
+<div id="searchForm">
     <!-- TODO: Richard forms-->
     <form name="searchForm" novalidate>
     	<div class="row">
@@ -11,8 +11,8 @@
 				<input type="text" class="form-control" name="state" id="state" placeholder="Search a State" ng-model="state" required>
 			</div>
 			<div class="col-md-4">
-				<label>Zip Code</label>
-				<input type="text" class="form-control" name="zip" id="zip" placeholder="Search a ZIP Code" ng-model="zip" required>
+				<label>Radius (in miles)</label>
+				<input type="number" class="form-control" min=1 name="radius" id="radius" placeholder="Radius" ng-model="radius" required>
 			</div>
 		</div>
 		<div class="row">
@@ -39,6 +39,14 @@
     </form>
 </div>
 
-<!-- The map -->
-<div id="map-container"></div>
+<div id="resultsArea">
+	<!-- Houses the list of results-->
+	<div id="listDiv">
+		<h2>Events Shown on Map</h2>
+		<ul id="resultsList"></ul>
+	</div>
+
+	<!-- The map -->
+	<div id="map-container"></div>
+</div>
 

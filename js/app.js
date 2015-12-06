@@ -19,8 +19,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').locate({setView: true, maxZoom: 13});
-        var url = "http://api.seatgeek.com/2/events?";
+        var map = L.map('map-container').locate({setView: true, maxZoom: 12});
+        var url = "http://api.bandsintown.com/events/search.json?api_version=2.0&app_id=INFO340CGroupProject";
         var layerControl;
         var typeLayers = {};
 
@@ -31,42 +31,6 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             id: "mapbox.light",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
-
-        function getData(params) {
-            $http.get(url + params).then(function(response) {
-
-                // removes layer groups and layer control from the map
-                // for each new search
-                if (layerControl) {
-                    Object.keys(typeLayers).forEach(function (layer) {
-                        layerControl.removeLayer(typeLayers[layer]);
-                        map.removeLayer(typeLayers[layer]);
-                    });
-
-                    layerControl.removeFrom(map);
-
-                    typeLayers = {};
-                }
-
-                response.data.events.forEach(function(data) {
-                    var lat = data.venue.location.lat;
-                    var lon = data.venue.location.lon;
-                    var marker = L.circleMarker([lat, lon]);
-                    marker.setRadius(5);
-
-                    if (!typeLayers.hasOwnProperty(data.type)) {
-                        typeLayers[data.type] = L.layerGroup([]);
-                    }
-
-                    var date = new Date(data.datetime_local);
-                    var month = date.getMonth() + 1;
-                    marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
-                    marker.addTo(typeLayers[data.type]);
-                });
-                layerControl = L.control.layers(null, typeLayers);
-                layerControl.addTo(map);
-            });
-        }
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
         $scope.today = new Date();
@@ -105,28 +69,66 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         $scope.format = 'yyyy-MM-dd';
 
-        $scope.submitForm = function(form) {
+        $scope.submitForm = function() {
             var query = "";
-            if ($scope.city) {
-                query = query + "venue.city=" + $scope.city + "&";
+
+            if ($scope.city && !$scope.state) {
+                query = query + "&location=" + $scope.city ;
             }
-            if ($scope.state) {
-                query = query + "venue.state=" + $scope.state + "&";
+
+            if ($scope.city && $scope.state) {
+                query = query + "&location=" + $scope.city + "," + $scope.state;
             }
-            if ($scope.zip) {
-                query = query + "venue.postal_code=" + $scope.zip + "&";
-            }
-            if ($scope.dateStart) {
+
+            if ($scope.dateStart && $scope.dateEnd) {
                 var startDate = angular.element(document.getElementById("startDate"))[0].value;
-                query = query + "datetime_utc.gte=" + startDate + "&";
-            }
-            if ($scope.dateEnd) {
                 var endDate = angular.element(document.getElementById("endDate"))[0].value;
-                query = query + "datetime_utc.lte=" + endDate + "&";
+                query += "&date=" + startDate + "," + endDate;
             }
-            query = query + "per_page=100";
-            console.log(query); 
-            getData(query);
+
+            if($scope.radius) {
+                query += "&radius=" + $scope.radius;
+            }
+
+            query += "&callback=JSON_CALLBACK";
+
+            console.log(url + query);
+
+            $http.jsonp(url + query)
+                .success(function(response) {
+                    // removes layer groups and layer control from the map
+                    // for each new search
+                    if (layerControl) {
+                        Object.keys(typeLayers).forEach(function (layer) {
+                            layerControl.removeLayer(typeLayers[layer]);
+                            map.removeLayer(typeLayers[layer]);
+                        });
+
+                        layerControl.removeFrom(map);
+
+                        typeLayers = {};
+                    }
+                    console.log(response.data);
+
+                    response.forEach(function(data) {
+                        console.log(data);
+                        var lat = data.venue.latitude;
+                        var lon = data.venue.longitude;
+                        var marker = L.circleMarker([lat, lon]);
+                        marker.setRadius(5);
+
+                        if (!typeLayers.hasOwnProperty(data.ticket_status)) {
+                            typeLayers[data.ticket_status] = L.layerGroup([]);
+                        }
+
+                        var date = new Date(data.datetime_local);
+                        var month = date.getMonth() + 1;
+                        marker.bindPopup("<p class='eventTitle'>" + data.artists[0].name + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.ticket_url + "'>BandsInTown Listing</a>");
+                        marker.addTo(typeLayers[data.ticket_status]);
+                    });
+                    layerControl = L.control.layers(null, typeLayers);
+                    layerControl.addTo(map);
+                });
         }
 
     }])
