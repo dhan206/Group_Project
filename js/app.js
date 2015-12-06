@@ -20,9 +20,10 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         //the map
         var map = L.map('map-container').locate({setView: true, maxZoom: 12});
-        var url = "http://api.eventful.com/json/events/search?app_key=fmP5gQxspkT4NNqS";
+        var url = "http://api.songkick.com/api/3.0/events.json?apikey=io09K9l3ebJxmxe2";
         var layerControl;
         var typeLayers = {};
+        // songkick api: io09K9l3ebJxmxe2
 
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -31,6 +32,53 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             id: "mapbox.light",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
+
+
+        function fillMap(param) {
+            $http.get(url + param)
+                .success(function (response) {
+                // removes layer groups and layer control from the map
+                // for each new search
+                if (layerControl) {
+                    Object.keys(typeLayers).forEach(function (layer) {
+                        layerControl.removeLayer(typeLayers[layer]);
+                        map.removeLayer(typeLayers[layer]);
+                    });
+
+                    layerControl.removeFrom(map);
+
+                    typeLayers = {};
+                }
+
+                console.log(response);
+
+                response.resultsPage.results.event.forEach(function (data) {
+
+                    var lat = data.location.lat;
+                    var lon = data.location.lng;
+                    var marker = L.circleMarker([lat, lon]);
+                    marker.setRadius(5);
+
+                    if (!typeLayers.hasOwnProperty(data.ageRestriction)) {
+                        typeLayers[data.ageRestriction] = L.layerGroup([]);
+                    }
+
+                    var artist = [];
+
+                    data.performance.forEach(function(performance) {
+                        artist.push(" " + performance.artist.displayName);
+                    });
+
+                    // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
+                    // TODO: as the search parameter.
+
+                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "' target='_blank'>Get directions!</a>" + "<br> Artist: " + artist.toString());
+                    marker.addTo(typeLayers[data.ageRestriction]);
+                });
+                layerControl = L.control.layers(null, typeLayers);
+                layerControl.addTo(map);
+            });
+        }
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
         $scope.today = new Date();
@@ -41,18 +89,18 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         var mm = $scope.today.getMonth() + 1; //January is 0!
         var yyyy = $scope.today.getFullYear();
 
-        if(dd<10) {
-            dd='0'+dd
-        } 
+        if (dd < 10) {
+            dd = '0' + dd
+        }
 
-        if(mm<10) {
-            mm='0'+mm
-        } 
+        if (mm < 10) {
+            mm = '0' + mm
+        }
 
-        $scope.today = mm+'/'+dd+'/'+yyyy;
+        $scope.today = mm + '/' + dd + '/' + yyyy;
         console.log($scope.today);
 
-        $scope.open = function($event) {
+        $scope.open = function ($event) {
             $scope.status.isOpen = true;
             console.log($scope.dateStart);
             console.log($scope.dateEnd);
@@ -67,68 +115,39 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             opened: false
         };
 
-        $scope.format = "yyyy MM dd";
+        $scope.format = "yyyy-MM-dd";
 
-        $scope.submitForm = function() {
+        $scope.submitForm = function () {
             var query = "";
+            var metroID = "";
 
-            if ($scope.city && !$scope.state) {
-                query = query + "&location=" + $scope.city ;
-            }
 
-            if ($scope.city && $scope.state) {
-                query = query + "&location=" + $scope.city + "," + $scope.state;
-            }
+            if ($scope.city) {
 
-            if ($scope.dateStart && $scope.dateEnd) {
-                var startDate = angular.element(document.getElementById("endDate"))[0].value.replace(/ /g, "") + "00";
-                var endDate = angular.element(document.getElementById("endDate"))[0].value.replace(/ /g, "") + "00";
-                query += "&date=" + startDate + "-" + endDate;
-            }
+                // Gets the metroID using the inputted city name. A requirement from songkick's api
+                $http.get("http://api.songkick.com/api/3.0/search/locations.json?apikey=io09K9l3ebJxmxe2&query=" + $scope.city + "&per_page=1")
+                    .success(function (response) {
+                        console.log(response.resultsPage.results.location[0].metroArea.id);
+                        metroID = response.resultsPage.results.location[0].metroArea.id;
+                        query += "&location=sk:" + metroID;
 
-            if($scope.radius) {
-                query += "&within=" + $scope.radius ;
-            }
-
-            query += "&page_size=50&?q=music&callback=JSON_CALLBACK";
-
-            console.log(url + query);
-
-            $http.jsonp(url + query)
-                .success(function(response) {
-                    // removes layer groups and layer control from the map
-                    // for each new search
-                    if (layerControl) {
-                        Object.keys(typeLayers).forEach(function (layer) {
-                            layerControl.removeLayer(typeLayers[layer]);
-                            map.removeLayer(typeLayers[layer]);
-                        });
-
-                        layerControl.removeFrom(map);
-
-                        typeLayers = {};
-                    }
-                    console.log(response);
-
-                    response.events.event.forEach(function(data) {
-                        console.log(data);
-                        var lat = data.latitude;
-                        var lon = data.longitude;
-                        var marker = L.circleMarker([lat, lon]);
-                        marker.setRadius(5);
-
-                        if (!typeLayers.hasOwnProperty(data.olson_path)) {
-                            typeLayers[data.olson_path] = L.layerGroup([]);
+                        if ($scope.dateStart) {
+                            var startDate = angular.element(document.getElementById("endDate"))[0].value;
+                            query += "&min_date=" + startDate;
                         }
 
-                        var date = new Date(data.datetime_local);
-                        var month = date.getMonth() + 1;
-                        marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue_name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Eventful Listing</a>");
-                        marker.addTo(typeLayers[data.olson_path]);
-                    });
-                    layerControl = L.control.layers(null, typeLayers);
-                    layerControl.addTo(map);
-                });
-        }
+                        if ($scope.dateEnd) {
+                            var endDate = angular.element(document.getElementById("endDate"))[0].value;
+                            query += "&max_date=" + endDate;
+                        }
 
+                        query += "&per_page=100";
+
+                        console.log(url + query);
+
+                        fillMap(query);
+                    });
+            }
+
+        }
     }])
