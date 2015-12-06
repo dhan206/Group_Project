@@ -4,6 +4,22 @@ body {
 	background-color: cadetblue;
 }
 
+#appName {
+	font-family: 'Lobster', cursive;
+	font-size: 3em;
+	text-align: center;
+	color: white;
+/*	background-image: url('../img/bumbershoot_BG.jpg');
+	background-repeat: no-repeat;*/
+    background-size: 100% 100%;
+}
+
+#appDescribe {
+	color:white;
+	text-align: center;
+	font-size: 1.5em;
+}
+
 #searchForm {
 	padding: 1em;
 }
@@ -35,6 +51,14 @@ body {
 
 	#map-container {
 		height: 90vh;
+	}
+
+	#appName {
+		font-size: 6em;
+	}
+
+	#appDescribe {
+		font-size: 2em;
 	}
 
 }
