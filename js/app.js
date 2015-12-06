@@ -20,7 +20,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         //the map
         var map = L.map('map-container').locate({setView: true, maxZoom: 12});
-        var url = "http://api.bandsintown.com/events/search.json?api_version=2.0&app_id=INFO340CGroupProject";
+        var url = "http://api.eventful.com/json/events/search?app_key=fmP5gQxspkT4NNqS";
         var layerControl;
         var typeLayers = {};
 
@@ -67,7 +67,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             opened: false
         };
 
-        $scope.format = 'yyyy-MM-dd';
+        $scope.format = "yyyy MM dd";
 
         $scope.submitForm = function() {
             var query = "";
@@ -81,16 +81,16 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             }
 
             if ($scope.dateStart && $scope.dateEnd) {
-                var startDate = angular.element(document.getElementById("startDate"))[0].value;
-                var endDate = angular.element(document.getElementById("endDate"))[0].value;
-                query += "&date=" + startDate + "," + endDate;
+                var startDate = angular.element(document.getElementById("endDate"))[0].value.replace(/ /g, "") + "00";
+                var endDate = angular.element(document.getElementById("endDate"))[0].value.replace(/ /g, "") + "00";
+                query += "&date=" + startDate + "-" + endDate;
             }
 
             if($scope.radius) {
-                query += "&radius=" + $scope.radius;
+                query += "&within=" + $scope.radius ;
             }
 
-            query += "&callback=JSON_CALLBACK";
+            query += "&page_size=50&?q=music&callback=JSON_CALLBACK";
 
             console.log(url + query);
 
@@ -108,23 +108,23 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                         typeLayers = {};
                     }
-                    console.log(response.data);
+                    console.log(response);
 
-                    response.forEach(function(data) {
+                    response.events.event.forEach(function(data) {
                         console.log(data);
-                        var lat = data.venue.latitude;
-                        var lon = data.venue.longitude;
+                        var lat = data.latitude;
+                        var lon = data.longitude;
                         var marker = L.circleMarker([lat, lon]);
                         marker.setRadius(5);
 
-                        if (!typeLayers.hasOwnProperty(data.ticket_status)) {
-                            typeLayers[data.ticket_status] = L.layerGroup([]);
+                        if (!typeLayers.hasOwnProperty(data.olson_path)) {
+                            typeLayers[data.olson_path] = L.layerGroup([]);
                         }
 
                         var date = new Date(data.datetime_local);
                         var month = date.getMonth() + 1;
-                        marker.bindPopup("<p class='eventTitle'>" + data.artists[0].name + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.ticket_url + "'>BandsInTown Listing</a>");
-                        marker.addTo(typeLayers[data.ticket_status]);
+                        marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue_name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Eventful Listing</a>");
+                        marker.addTo(typeLayers[data.olson_path]);
                     });
                     layerControl = L.control.layers(null, typeLayers);
                     layerControl.addTo(map);
