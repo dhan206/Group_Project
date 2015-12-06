@@ -19,7 +19,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').setView([37.50, -97.00], 4);
+        var map = L.map('map-container').locate({setView: true, maxZoom: 13});
         var url = "http://api.seatgeek.com/2/events?";
         var layerControl;
         var typeLayers = {};
@@ -59,7 +59,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     }
 
                     var date = new Date(data.datetime_local);
-                    marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
+                    var month = date.getMonth() + 1;
+                    marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
                     marker.addTo(map);
                     markers.push(marker);
                     marker.addTo(typeLayers[data.type]);
