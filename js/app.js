@@ -62,7 +62,6 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     var month = date.getMonth() + 1;
                     marker.bindPopup("<p class='eventTitle'>" + data.title + "</p>" + month + "/" + date.getDate() + "/" + date.getFullYear()  + "<br>" + data.venue.name + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'>Get directions!</a>" + "<br><a href='" + data.url + "'>Seatgeek Listing</a>")
                     marker.addTo(map);
-                    markers.push(marker);
                     marker.addTo(typeLayers[data.type]);
                 });
                 layerControl = L.control.layers(null, typeLayers);
