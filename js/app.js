@@ -19,7 +19,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').locate({setView: true, maxZoom: 12});
+        var map = L.map('map-container').locate({setView: true, maxZoom: 12, enableHighAccuracy: true});
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=io09K9l3ebJxmxe2";
         var layerControl;
         var typeLayers = {};
@@ -29,10 +29,9 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 100,
             minZoom: 3,
-            id: "mapbox.light",
+            id: "mapbox.emerald",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
-
 
         function fillMap(param) {
             $http.get(url + param)
@@ -50,20 +49,13 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     typeLayers = {};
                 }
 
-                var minLat = 10000000;
-                var maxLat = -1000000;
-                var minLon = 10000000;
-                var maxLon = -1000000;
-
-                console.log(response);
                 var bounds = new L.LatLngBounds();
                 response.resultsPage.results.event.forEach(function (data) {
 
                     var lat = data.location.lat;
                     var lon = data.location.lng;
 
-                    var marker = L.circleMarker([lat, lon]);
-                    marker.setRadius(5);
+                    var marker = L.marker([lat, lon]);
                     bounds.extend(marker.getLatLng());
 
                     if (!typeLayers.hasOwnProperty(data.type)) {
