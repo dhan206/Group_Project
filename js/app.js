@@ -76,11 +76,47 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         artist.push(" " + performance.artist.displayName);
                     });
 
+                    // spotify object variables
+                    var artistObj;
+                    var trackObj;
+                    var albumUrl;
+
+                    // $.ajax({
+                    //     url: 'https://api.spotify.com/v1/search',
+                    //     data: {
+                    //         q: artist.toString(),
+                    //         type: 'artist'
+                    //     },
+                    //     success: function (response) {
+                    //         if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+                    //             artistObj = response.artists.items[0];
+                    //             console.log(artistObj.id);
+                    //             $.ajax({
+                    //                 url: 'https://api.spotify.com/v1/artists/43ZHCT0cAZBISjO8DG9PnE/top-tracks?country=SE',
+                    //                 success: function (tracks) {
+                    //                     console.log("album search success");
+                    //                     // trackObj = tracks[0];
+                    //                     // albumUrl = trackObj.album.images[0].url;
+                    //                 }
+                    //             });
+                    //         } else {
+                    //             artistObj = null;
+                    //         }
+
+                    //     }
+                    // });
+
+
                     // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
                     // TODO: as the search parameter.
+                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
+                        + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
+                        data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
+                        "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" 
+                        + "<br><div style='background-image:url(" + albumUrl + ") class='cover'></div>"); 
                     
-                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>");
                     marker.addTo(typeLayers[data.type]);
+                    
                 });
             
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
