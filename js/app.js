@@ -75,7 +75,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><br><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                     marker.addTo(typeLayers[data.ageRestriction]);
                 });
-                layerControl = L.control.layers(null, typeLayers);
+                layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                 layerControl.addTo(map);
             });
         }
