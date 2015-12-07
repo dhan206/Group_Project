@@ -50,14 +50,21 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     typeLayers = {};
                 }
 
-                console.log(response);
+                var minLat = 10000000;
+                var maxLat = -1000000;
+                var minLon = 10000000;
+                var maxLon = -1000000;
 
+                console.log(response);
+                var bounds = new L.LatLngBounds();
                 response.resultsPage.results.event.forEach(function (data) {
 
                     var lat = data.location.lat;
                     var lon = data.location.lng;
+
                     var marker = L.circleMarker([lat, lon]);
                     marker.setRadius(5);
+                    bounds.extend(marker.getLatLng());
 
                     if (!typeLayers.hasOwnProperty(data.type)) {
                         typeLayers[data.type] = L.layerGroup([]);
@@ -75,10 +82,12 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><br><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>");
                     marker.addTo(typeLayers[data.type]);
                 });
-
+            
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                 layerControl.addTo(map);
+                map.fitBounds(bounds);
             });
+            
         }
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
