@@ -33,6 +33,15 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var userLocation = L.circleMarker([position.coords.latitude, position.coords.longitude], {color: "red", fillColor: "red", opacity: 1, fillOpacity: .4});
+                userLocation.setRadius(4);
+                userLocation.bindPopup("<h6>You are here.</h6>");
+                userLocation.addTo(map);
+            });
+        }
+
         function fillMap(param) {
             $http.get(url + param)
                 .success(function (response) {
