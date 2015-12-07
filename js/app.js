@@ -72,7 +72,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
                     // TODO: as the search parameter.
 
-                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "' target='_blank'>Get directions!</a>" + "<br> Artist: " + artist.toString());
+                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><br><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                     marker.addTo(typeLayers[data.ageRestriction]);
                 });
                 layerControl = L.control.layers(null, typeLayers);

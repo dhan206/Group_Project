@@ -17,12 +17,18 @@
 <body ng-app="EventFinderApp">
     <div id="header">
         <h1 id="appName">ConcertFindr<h1>
+        <a href="http://www.songkick.com"><img id="skLogo" src='img/sklogo.png' alt='SongKick Logo'></a>
         <h3 id="appDescribe">Whether you're home or on-the-go, there's always a show.</h3>
 <!--         <a ui-sref="home">HOME</a> -->
     </div>
 
     <!-- Where different routes will be displayed-->
     <div ui-view></div>
+
+    <footer>
+      <p>Created by: Derek Han, Kai Yoshino, Kendall Reonal, and Richard Ding</p>
+      <p>Concert data from <a href="http://www.songkick.com">Songkick</a></p>
+    </footer>
 
     <!-- Angular ui router library-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
