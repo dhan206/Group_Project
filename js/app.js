@@ -59,8 +59,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     var marker = L.circleMarker([lat, lon]);
                     marker.setRadius(5);
 
-                    if (!typeLayers.hasOwnProperty(data.ageRestriction)) {
-                        typeLayers[data.ageRestriction] = L.layerGroup([]);
+                    if (!typeLayers.hasOwnProperty(data.type)) {
+                        typeLayers[data.type] = L.layerGroup([]);
                     }
 
                     var artist = [];
@@ -72,8 +72,13 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
                     // TODO: as the search parameter.
 
+<<<<<<< HEAD
                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><br><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>");
                     marker.addTo(typeLayers[data.ageRestriction]);
+=======
+                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><br><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
+                    marker.addTo(typeLayers[data.type]);
+>>>>>>> 8e05f77564dad2be0b5f977e0cb363e66fc1e24d
                 });
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                 layerControl.addTo(map);
@@ -132,7 +137,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         query += "&location=sk:" + metroID;
 
                         if ($scope.dateStart) {
-                            var startDate = angular.element(document.getElementById("endDate"))[0].value;
+                            var startDate = angular.element(document.getElementById("startDate"))[0].value;
                             query += "&min_date=" + startDate;
                         }
 
