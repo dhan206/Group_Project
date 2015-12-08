@@ -20,10 +20,10 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         //the map
         var map = L.map('map-container').locate({setView: true, maxZoom: 12, enableHighAccuracy: true});
-        var url = "http://api.songkick.com/api/3.0/events.json?apikey=io09K9l3ebJxmxe2";
+        var songKickApiKey = "HqtbfXIKRDQWYRLi";
+        var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
         var layerControl;
         var typeLayers = {};
-        // songkick api: io09K9l3ebJxmxe2
 
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -33,6 +33,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
+
+        // Adds a red circle marker to the user's location if available.
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 var userLocation = L.circleMarker([position.coords.latitude, position.coords.longitude], {color: "red", fillColor: "red", opacity: 1, fillOpacity: .4});
@@ -79,7 +81,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                     // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
                     // TODO: as the search parameter.
-                    
+
                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>");
                     marker.addTo(typeLayers[data.type]);
                 });
@@ -115,7 +117,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             $scope.status.isOpen = true;
             console.log($scope.dateStart);
             console.log($scope.dateEnd);
-        }
+        };
 
         $scope.dateOptions = {
             formatYear: 'yy',
