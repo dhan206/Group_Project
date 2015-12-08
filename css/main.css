@@ -14,11 +14,17 @@ body {
     background-size: 100% 100%;
 }
 
-#appDescribe, #listDiv h2 {
+#appDescribe, #listDiv h2 , #searchForm{
 	color: white;
 	text-align: center;
 	font-variant: small-caps;
 	font-style: italic;
+}
+
+#searchForm {
+	padding: 1em;
+	text-align: left;
+	font-size: 16px;
 }
 
 #skLogo {
@@ -26,10 +32,6 @@ body {
 	height: 20px;
 	top: 0;
 	right: 0;
-}
-
-#searchForm {
-	padding: 1em;
 }
 
 #map-container {
@@ -96,4 +98,23 @@ body {
 		font-size: 16px;
 	}
 
+}
+
+.image {
+	height: 100px;
+	width: 100px;
+}
+
+.cover {
+	max-width: 100px;
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    background-size: cover;
+}
+.cover:hover {
+    cursor: pointer;
+}
+.cover.playing {
+    border: 5px solid #e45343;
 }

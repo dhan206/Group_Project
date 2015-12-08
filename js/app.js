@@ -19,7 +19,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').locate({setView: true, maxZoom: 12});
+        var map = L.map('map-container').locate({setView: true, maxZoom: 12, enableHighAccuracy: true});
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=io09K9l3ebJxmxe2";
         var layerControl;
         var typeLayers = {};
@@ -29,10 +29,18 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 100,
             minZoom: 3,
-            id: "mapbox.light",
+            id: "mapbox.emerald",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var userLocation = L.circleMarker([position.coords.latitude, position.coords.longitude], {color: "red", fillColor: "red", opacity: 1, fillOpacity: .4});
+                userLocation.setRadius(4);
+                userLocation.bindPopup("<h6>You are here.</h6>");
+                userLocation.addTo(map);
+            });
+        }
 
         function fillMap(param) {
             $http.get(url + param)
@@ -50,20 +58,13 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     typeLayers = {};
                 }
 
-                var minLat = 10000000;
-                var maxLat = -1000000;
-                var minLon = 10000000;
-                var maxLon = -1000000;
-
-                console.log(response);
                 var bounds = new L.LatLngBounds();
                 response.resultsPage.results.event.forEach(function (data) {
 
                     var lat = data.location.lat;
                     var lon = data.location.lng;
 
-                    var marker = L.circleMarker([lat, lon]);
-                    marker.setRadius(5);
+                    var marker = L.marker([lat, lon]);
                     bounds.extend(marker.getLatLng());
 
                     if (!typeLayers.hasOwnProperty(data.type)) {
@@ -78,45 +79,48 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                     // spotify object variables
                     var artistObj;
-                    var trackObj;
                     var albumUrl;
+                    var trackObj;
 
-                    // $.ajax({
-                    //     url: 'https://api.spotify.com/v1/search',
-                    //     data: {
-                    //         q: artist.toString(),
-                    //         type: 'artist'
-                    //     },
-                    //     success: function (response) {
-                    //         if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
-                    //             artistObj = response.artists.items[0];
-                    //             console.log(artistObj.id);
-                    //             $.ajax({
-                    //                 url: 'https://api.spotify.com/v1/artists/43ZHCT0cAZBISjO8DG9PnE/top-tracks?country=SE',
-                    //                 success: function (tracks) {
-                    //                     console.log("album search success");
-                    //                     // trackObj = tracks[0];
-                    //                     // albumUrl = trackObj.album.images[0].url;
-                    //                 }
-                    //             });
-                    //         } else {
-                    //             artistObj = null;
-                    //         }
+                    $.ajax({
+                        url: 'https://api.spotify.com/v1/search',
+                        data: {
+                            q: artist.toString(),
+                            type: 'artist'
+                        },
+                        success: function (response) {
+                            if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+                                artistObj = response.artists.items[0];
+                                $.ajax({
+                                    url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
+                                    context: this,
+                                    success: function (top) {
+                                        trackObj = top.tracks[0];
+                                        console.log(trackObj);
+                                        // albumUrl = "" + trackObj.album.images[0].url;
+                                        // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
+                                        // TODO: as the search parameter.
+                                        marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
+                                            + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
+                                            data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
+                                            "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" 
+                                            + "<br><br><img class='cover' src='" + trackObj.album.images[0].url + "'>"); 
+                                        marker.addTo(typeLayers[data.type]);
+                                    }
+                                });
+                            } else {
+                                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
+                                    + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
+                                    data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
+                                    "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
+                                marker.addTo(typeLayers[data.type]);                         
+                            }
 
-                    //     }
-                    // });
+                        }
+                    })
 
+                        
 
-                    // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
-                    // TODO: as the search parameter.
-                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
-                        + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
-                        data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
-                        "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" 
-                        + "<br><div style='background-image:url(" + albumUrl + ") class='cover'></div>"); 
-                    
-                    marker.addTo(typeLayers[data.type]);
-                    
                 });
             
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
