@@ -52,7 +52,7 @@ body {
 	width: 100vw;
 	font-size: 12px;
 	color: white;
-	padding: 1em .5em;
+	padding: 1em;
 	background-color: rgba(0, 0, 0, .4);
 	border-top: 2px solid white;
 	overflow: hidden;
