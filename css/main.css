@@ -75,6 +75,7 @@ body {
 	height: 85.5vh;
 	overflow: scroll;
 	padding: 0;
+	margin: 0;
 }
 
 .resultElement {
