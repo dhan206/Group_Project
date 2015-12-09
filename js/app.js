@@ -160,11 +160,56 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             var lat = data.location.lat;
             var lon = data.location.lng;
 
+            var milTime = data.start.time;
+            var standardTime;
+            if (milTime == null) {
+                standardTime = 'Not specified';
+            } else {
+                standardTime = milToStandard(milTime);
+            }
+            function milToStandard(value) {
+                if (value !== null && value !== undefined){ 
+                    if(value.indexOf('AM') > -1 || value.indexOf('PM') > -1){ 
+                      return value;
+                    }
+                    else {
+                      if(value.length == 8){ 
+                        var hour = value.substring ( 0,2 ); 
+                        var minutes = value.substring ( 3,5 ); 
+                        var identifier = 'AM'; 
+
+                        if(hour == 12){ 
+                          identifier = 'PM';
+                        }
+                        if(hour == 0){ 
+                          hour=12;
+                        }
+                        if(hour > 12){ 
+                          hour = hour - 12;
+                          identifier='PM';
+                        }
+                        return hour + ':' + minutes + ' ' + identifier; 
+                      }
+                      else { 
+                        return value;
+                      }
+                    }
+                }
+            };
+
+            var ageLimit;
+            if (data.ageRestriction == null) {
+                ageLimit = "Not specified";
+            } else {
+                ageLimit = data.ageRestriction;
+            }
             var popup = L.popup()
                 .setLatLng(L.latLng(data.location.lat, data.location.lng))
-                .setContent("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>")
+                .setContent("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>")
                 .openOn(map);
             console.log(data);
+
+
         };
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
