@@ -35,8 +35,12 @@
 				</p>
 			</div>
 		</div>
-		<button id="submitButton" class="btn btn-primary" type="submit" ng-click="submitForm(searchForm)">Search</button>
+		<button id="submitButton" class="btn btn-primary" type="submit" ng-click="submitForm(searchForm)" ng-disabled="searchForm.$invalid">search concerts & festivals</button>
     </form>
+</div>
+
+<div id="alertArea">
+
 </div>
 
 <div id="resultsArea">
