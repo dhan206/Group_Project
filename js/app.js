@@ -130,11 +130,50 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         ageLimit = data.ageRestriction;
                     }
 
-                    // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
-                    // TODO: as the search parameter.
-                                 
-                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
-                marker.addTo(typeLayers[data.type]);
+                    // spotify object variable
+                    var trackObj;
+                    var artistObj;
+
+                    // ajax request to spotify for artist from songick
+                    $.ajax({
+                        url: 'https://api.spotify.com/v1/search',
+                        data: {
+                            q: artist.toString(),
+                            type: 'artist'
+                        },
+                        success: function (response) {
+                            if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+
+                                artistObj = response.artists.items[0];
+
+                                // ajax request to spotify for top tracks of artist from previous chained ajax request
+                                $.ajax({
+                                    url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
+                                    success: function (top) {
+                                        trackObj = top.tracks[0];
+                                        console.log(trackObj);
+
+                                        // adds markers for shows with artists on  spotify
+                                        marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + 
+                                            "<div class='container'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url + 
+                                            "'></div><div class='col-xs-3'><div class='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
+                                            trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name+ "<br>by " + trackObj.artists[0].name 
+                                            + "</p></div></div></div>");
+                                        marker.addTo(typeLayers[data.type]);
+
+                                    }
+                                })
+                            } else {
+                                //adds marker for shows without artists on spotify
+                                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
+                                    + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
+                                    data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
+                                    "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
+                                marker.addTo(typeLayers[data.type]);                         
+                            }
+
+                        }
+                    })
                 });
                 
                 console.log($scope.eventData);
@@ -142,8 +181,44 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 layerControl.addTo(map);
                 map.fitBounds(bounds);
             });
-            
         }
+
+        var fetchTracks = function (trackId, callback) {
+            $.ajax({
+                url: 'https://api.spotify.com/v1/tracks/' + trackId,
+                success: function (response) {
+                    callback(response);
+                }
+            });
+        };
+
+        var playingCssClass = 'playing';
+        var playing = true;
+        var audioObject = null;
+        var stopped = false;
+
+        $('#map-container').on('click', '#listen', function(e) {
+            var target = e.target;
+            if (target.classList.contains(playingCssClass)) {
+                audioObject = audioObject.pause();
+            } else {
+                if (audioObject) {
+                    audioObject.pause();
+                }
+                fetchTracks(target.getAttribute('track-id'), function (data) {
+                audioObject = new Audio(data.preview_url);
+                audioObject.play();
+                target.classList.add(playingCssClass);
+                audioObject.addEventListener('ended', function () {
+                    target.classList.remove(playingCssClass);
+                });
+                audioObject.addEventListener('pause', function () {
+                    target.classList.remove(playingCssClass);
+                });
+            });
+            }
+        });
+
 
         $scope.locate = function(data) {
 
