@@ -72,7 +72,7 @@ body {
 }
 
 #resultsList {
-	height: 85vh;
+	height: 85.5vh;
 	overflow: scroll;
 	padding: 0;
 }
