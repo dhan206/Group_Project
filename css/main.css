@@ -14,7 +14,7 @@ body {
     background-size: 100% 100%;
 }
 
-#appDescribe, #listDiv h2 , #searchForm{
+#appDescribe, #resultsDiv h2 , #searchForm{
 	color: white;
 	text-align: center;
 	font-variant: small-caps;
@@ -74,11 +74,26 @@ body {
 #resultsList {
 	height: 80vh;
 	overflow: scroll;
+	padding: 0;
+}
+
+.resultElement {
+	list-style: none;
+	background-color: rgba(255, 255, 255, .7);
+	border-radius: 5px;
+	padding: 1em;
+	margin: .5em 1em;
+}
+
+.resultElement:hover {
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, .3);
+	color: white;
 }
 
 @media screen and (min-width: 768px) {
 
-	#listDiv {
+	#resultsDiv {
 		width: 25vw;
 		min-height: 90vh;
 		float: left;

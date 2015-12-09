@@ -4,7 +4,7 @@
     	<div class="row">
 			<div class="col-md-4">
 				<label>City</label>
-				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" ng-model="city" required>
+				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" ng-model="city" required autofocus>
 			</div>
 			<!--<div class="col-md-4">-->
 				<!--<label>State</label>-->
@@ -45,14 +45,13 @@
 
 <div id="resultsArea">
 	<!-- Houses the list of results-->
-	<div id="listDiv">
+	<div id="resultsDiv" ng-show="eventData.length > 0">
 		<h2>Events Shown on Map</h2>
-		<input name="query" placeholder="Search" id="search" ng-model="searchQuery" ng-show="eventData.length > 0">
+		<input name="query" class="form-control" placeholder="Search" id="search" ng-model="searchQuery">
 		<ul id="resultsList">
-			<li ng-repeat="data in eventData | filter:searchQuery">
+			<li ng-repeat="data in eventData | filter:searchQuery" class="resultElement" ng-click="locate(data)">
 				<p>{{data.displayName}}</p>
 				<a href={{data.uri}} target="_blank">Link</a>
-				<a href="" ng-click="locate(data)">Find on Map</a>
 			</li>
 		</ul>
 	</div>
