@@ -44,11 +44,16 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             });
         }
 
+        $scope.eventData = [];
+
         function fillMap(param) {
             $http.get(url + param)
                 .success(function (response) {
                 // removes layer groups and layer control from the map
                 // for each new search
+
+                $scope.eventData = [];
+
                 if (layerControl) {
                     Object.keys(typeLayers).forEach(function (layer) {
                         layerControl.removeLayer(typeLayers[layer]);
@@ -78,6 +83,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     data.performance.forEach(function(performance) {
                         artist.push(" " + performance.artist.displayName);
                     });
+
+                    $scope.eventData.push(data);
 
                     var milTime = data.start.time;
                     var standardTime;
@@ -116,18 +123,43 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         }
                     };
 
+                    var ageLimit;
+                    if (data.ageRestriction == null) {
+                        ageLimit = "Not specified";
+                    } else {
+                        ageLimit = data.ageRestriction;
+                    }
+
                     // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
                     // TODO: as the search parameter.
                                  
-                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
+                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                 marker.addTo(typeLayers[data.type]);
                 });
-            
+                
+                console.log($scope.eventData);
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                 layerControl.addTo(map);
                 map.fitBounds(bounds);
             });
             
+        }
+
+        $scope.locate = function(data) {
+
+            var artist = [];
+            data.performance.forEach(function(performance) {
+                artist.push(" " + performance.artist.displayName);
+            });
+
+            var lat = data.location.lat;
+            var lon = data.location.lng;
+
+            var popup = L.popup()
+                .setLatLng(L.latLng(data.location.lat, data.location.lng))
+                .setContent("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>")
+                .openOn(map);
+            console.log(data);
         }
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
