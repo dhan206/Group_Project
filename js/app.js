@@ -325,7 +325,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             if ($scope.city) {
 
                 // Gets the metroID using the inputted city name. A requirement from songkick's api
-                $http.get("http://api.songkick.com/api/3.0/search/locations.json?apikey=" + songKickApiKey + "&query=" + $scope.city + "&per_page=1")
+                $http.jsonp("http://api.songkick.com/api/3.0/search/locations.json?apikey=" + songKickApiKey + "&query=" + $scope.city + "&per_page=1&jsoncallback=JSON_CALLBACK")
                     .success(function (response) {
                         console.log(response.resultsPage.results.location[0].metroArea.id);
                         metroID = response.resultsPage.results.location[0].metroArea.id;
