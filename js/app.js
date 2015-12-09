@@ -77,11 +77,11 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         artist.push(" " + performance.artist.displayName);
                     });
 
-                    // spotify object variables
-                    var artistObj;
-                    var albumUrl;
+                    // spotify object variable
                     var trackObj;
+                    var artistObj;
 
+                    // ajax request to spotify for artist from songick
                     $.ajax({
                         url: 'https://api.spotify.com/v1/search',
                         data: {
@@ -90,27 +90,31 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         },
                         success: function (response) {
                             if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+
                                 artistObj = response.artists.items[0];
+
+                                // ajax request to spotify for top tracks of artist from previous chained ajax request
                                 $.ajax({
                                     url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
-                                    context: this,
                                     success: function (top) {
                                         trackObj = top.tracks[0];
                                         console.log(trackObj);
-                                        // albumUrl = "" + trackObj.album.images[0].url;
-                                        // TODO: Add spotify widget to map pop-ups, using the first artist in the artist array
-                                        // TODO: as the search parameter.
+
+                                        // adds markers for shows with artists on  spotify
                                         marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
                                             + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
                                             data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
                                             "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + 
                                             "<div class='container'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url + 
-                                            "'></div><div class='col-xs-3'><div class='description'><br><br><input type='submit' class='btn btn-primary' id='listen' value='LISTEN'><p id='music-text'>" 
-                                            + trackObj.name+ "<br>by " + trackObj.artists[0].name + "</p></div></div></div>"); 
+                                            "'></div><div class='col-xs-3'><div class='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
+                                            trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name+ "<br>by " + trackObj.artists[0].name 
+                                            + "</p></div></div></div>"); 
                                         marker.addTo(typeLayers[data.type]);
+
                                     }
                                 })
                             } else {
+                                //adds marker for shows without artists on spotify
                                 marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " 
                                     + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + 
                                     data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + 
@@ -120,17 +124,50 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                         }
                     })
-
-                        
-
                 });
-            
                 layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                 layerControl.addTo(map);
                 map.fitBounds(bounds);
             });
-            
         }
+
+        var fetchTracks = function (trackId, callback) {
+            $.ajax({
+                url: 'https://api.spotify.com/v1/tracks/' + trackId,
+                success: function (response) {
+                    callback(response);
+                }
+            });
+        };
+
+        var playingCssClass = 'playing';
+        var playing = true;
+        var audioObject = null;
+        var stopped = false;
+
+        $('#map-container').on('click', '#listen', function(e) {
+            var target = e.target;
+            if (target.classList.contains(playingCssClass)) {
+                audioObject = audioObject.pause();
+            } else {
+                if (audioObject) {
+                    audioObject.pause();
+                }
+                fetchTracks(target.getAttribute('track-id'), function (data) {
+                audioObject = new Audio(data.preview_url);
+                audioObject.play();
+                target.classList.add(playingCssClass);
+                audioObject.addEventListener('ended', function () {
+                    target.classList.remove(playingCssClass);
+                });
+                audioObject.addEventListener('pause', function () {
+                    target.classList.remove(playingCssClass);
+                });
+            });
+            }
+        });
+
+       
 
         //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
         $scope.today = new Date();
