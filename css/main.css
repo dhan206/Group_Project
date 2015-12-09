@@ -182,12 +182,22 @@ body {
     white-space: normal;
 }
 
-.description {
-	padding-left: 1em;
+#description {
+	display: in
+	width: 300px;
+	padding-left: 135px;
+	/*float: right;*/
 }
 
 #music-text {
+	float: none;
 	margin:5px 0;
-	padding-left: 2em;
-	padding-right: 5em;
+	padding-top: 5px;
+	padding-left: 15px;
+	padding-right: 2em;
+	text-align: left
+}
+
+.container .popup {
+	width: 300px;
 }

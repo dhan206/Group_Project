@@ -157,8 +157,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                                         // adds markers for shows with artists on  spotify
                                         marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + 
-                                            "<div class='container'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url + 
-                                            "'></div><div class='col-xs-3'><div class='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
+                                            "<div class='container popup'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url + 
+                                            "'></div><div id='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
                                             trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name+ "<br>by " + trackObj.artists[0].name 
                                             + "</p></div></div></div>");
                                         marker.addTo(typeLayers[data.type]);
