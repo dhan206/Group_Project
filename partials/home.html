@@ -43,7 +43,14 @@
 	<!-- Houses the list of results-->
 	<div id="listDiv">
 		<h2>Events Shown on Map</h2>
-		<ul id="resultsList"></ul>
+		<input name="query" placeholder="Search" id="search" ng-model="searchQuery" ng-show="eventData.length > 0">
+		<ul id="resultsList">
+			<li ng-repeat="data in eventData | filter:searchQuery">
+				<p>{{data.displayName}}</p>
+				<a href={{data.uri}} target="_blank">Link</a>
+				<a href="" ng-click="locate(data)">Find on Map</a>
+			</li>
+		</ul>
 	</div>
 
 	<!-- The map -->

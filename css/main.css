@@ -70,6 +70,11 @@ body {
 	padding: 0;
 }
 
+#resultsList {
+	height: 80vh;
+	overflow: scroll;
+}
+
 @media screen and (min-width: 768px) {
 
 	#listDiv {
