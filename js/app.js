@@ -48,7 +48,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.eventData = [];
 
         function fillMap(param) {
-            $http.get(url + param)
+            $http.jsonp(url + param)
                 .success(function (response) {
                 // removes layer groups and layer control from the map
                 // for each new search
@@ -342,7 +342,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                             query += "&max_date=" + endDate;
                         }
 
-                        query += "&per_page=100";
+                        query += "&per_page=100&jsoncallback=JSON_CALLBACK";
 
                         console.log(url + query);
 
