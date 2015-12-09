@@ -33,6 +33,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
+        map.scrollWheelZoom.disable();
 
         // Adds a red circle marker to the user's location if available.
         if (navigator.geolocation) {
