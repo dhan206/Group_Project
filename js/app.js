@@ -157,7 +157,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
             var popup = L.popup()
                 .setLatLng(L.latLng(data.location.lat, data.location.lng))
-                .setContent("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + "<br><iframe src='https://embed.spotify.com/?uri=spotify:track:4th1RQAelzqgY7wL53UGQt' width='300' height='80' frameborder='0' allowtransparency='true'></iframe>")
+                .setContent("<p class='eventTitle'>" + data.displayName + "</p><p class='artists'> Artist(s): " + artist.toString() + "</p> Event Date: " + data.start.date + "<br> Venue Name: " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>")
                 .openOn(map);
             console.log(data);
         };

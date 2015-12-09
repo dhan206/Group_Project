@@ -51,6 +51,7 @@
 		<ul id="resultsList">
 			<li ng-repeat="data in eventData | filter:searchQuery" class="resultElement" ng-click="locate(data)">
 				<p>{{data.displayName}}</p>
+				<p>Event date: {{data.start.date}}</p>
 				<a href={{data.uri}} target="_blank">Link</a>
 			</li>
 		</ul>
