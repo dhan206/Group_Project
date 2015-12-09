@@ -19,7 +19,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').locate({setView: true, maxZoom: 12, enableHighAccuracy: true});
+        var map = L.map('map-container').locate({setView: true, enableHighAccuracy: true});
         var songKickApiKey = "HqtbfXIKRDQWYRLi";
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
         var layerControl;
@@ -27,8 +27,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 100,
-            minZoom: 3,
+            maxZoom: 18,
+            minZoom: 14,
             id: "mapbox.emerald",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
@@ -72,7 +72,12 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     var lon = data.location.lng;
 
                     var marker = L.marker([lat, lon]);
-                    bounds.extend(marker.getLatLng());
+                    if(bounds.getCenter()) {
+                        if(bounds.getCenter())
+                        bounds.extend(marker.getLatLng());
+                    } else {
+                        bounds.extend(marker.getLatLng());
+                    }
 
                     if (!typeLayers.hasOwnProperty(data.type)) {
                         typeLayers[data.type] = L.layerGroup([]);
