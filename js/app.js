@@ -153,7 +153,6 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                                     url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
                                     success: function (top) {
                                         trackObj = top.tracks[0];
-                                        console.log(trackObj);
 
                                         // adds markers for shows with artists on  spotify
                                         marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + 
@@ -216,6 +215,18 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 });
             });
             }
+        });
+
+        $('#map-container').on('click', function (e) {
+            console.log("hey")
+
+            if (audioObject) {
+                audioObject = audioObject.pause();
+            }
+            var target = e.target;
+            if (target.classList.contains(playingCssClass)) {
+                audioObject = audioObject.pause();
+            } 
         });
 
 
