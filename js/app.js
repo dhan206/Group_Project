@@ -24,6 +24,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
         var layerControl;
         var typeLayers = {};
+        $scope.alert = false;
 
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -50,135 +51,144 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         function fillMap(param) {
             $http.jsonp(url + param)
                 .success(function (response) {
-                // removes layer groups and layer control from the map
-                // for each new search
+                if(response.resultsPage.totalEntries != 0) {
+                    $scope.eventData = [];
 
-                $scope.eventData = [];
+                    if (layerControl) {
+                        Object.keys(typeLayers).forEach(function (layer) {
+                            layerControl.removeLayer(typeLayers[layer]);
+                            map.removeLayer(typeLayers[layer]);
+                        });
 
-                if (layerControl) {
-                    Object.keys(typeLayers).forEach(function (layer) {
-                        layerControl.removeLayer(typeLayers[layer]);
-                        map.removeLayer(typeLayers[layer]);
-                    });
+                        layerControl.removeFrom(map);
 
-                    layerControl.removeFrom(map);
-
-                    typeLayers = {};
-                }
-
-                var bounds = new L.LatLngBounds();
-                response.resultsPage.results.event.forEach(function (data) {
-
-                    var lat = data.location.lat;
-                    var lon = data.location.lng;
-
-                    var marker = L.marker([lat, lon]);
-
-                    bounds.extend(marker.getLatLng());
-
-                    if (!typeLayers.hasOwnProperty(data.type)) {
-                        typeLayers[data.type] = L.layerGroup([]);
+                        typeLayers = {};
                     }
 
-                    var artist = [];
+                    var bounds = new L.LatLngBounds();
+                    response.resultsPage.results.event.forEach(function (data) {
 
-                    data.performance.forEach(function(performance) {
-                        artist.push(" " + performance.artist.displayName);
-                    });
+                        var lat = data.location.lat;
+                        var lon = data.location.lng;
 
-                    $scope.eventData.push(data);
+                        var marker = L.marker([lat, lon]);
 
-                    var milTime = data.start.time;
-                    var standardTime;
-                    if (milTime == null) {
-                        standardTime = 'Not specified';
-                    } else {
-                        standardTime = milToStandard(milTime);
-                    }
-                    function milToStandard(value) {
-                        if (value !== null && value !== undefined){ //If value is passed in
-                            if(value.indexOf('AM') > -1 || value.indexOf('PM') > -1){ //If time is already in standard time then don't format.
-                              return value;
-                            }
-                            else {
-                              if(value.length == 8){ //If value is the expected length for military time then process to standard time.
-                                var hour = value.substring ( 0,2 ); //Extract hour
-                                var minutes = value.substring ( 3,5 ); //Extract minutes
-                                var identifier = 'AM'; //Initialize AM PM identifier
+                        bounds.extend(marker.getLatLng());
 
-                                if(hour == 12){ //If hour is 12 then should set AM PM identifier to PM
-                                  identifier = 'PM';
-                                }
-                                if(hour == 0){ //If hour is 0 then set to 12 for standard time 12 AM
-                                  hour=12;
-                                }
-                                if(hour > 12){ //If hour is greater than 12 then convert to standard 12 hour format and set the AM PM identifier to PM
-                                  hour = hour - 12;
-                                  identifier='PM';
-                                }
-                                return hour + ':' + minutes + ' ' + identifier; //Return the constructed standard time
-                              }
-                              else { //If value is not the expected length than just return the value as is
-                                return value;
-                              }
-                            }
+                        if (!typeLayers.hasOwnProperty(data.type)) {
+                            typeLayers[data.type] = L.layerGroup([]);
                         }
-                    };
 
-                    var ageLimit;
-                    if (data.ageRestriction == null) {
-                        ageLimit = "Not specified";
-                    } else {
-                        ageLimit = data.ageRestriction;
-                    }
+                        var artist = [];
 
-                    // spotify object variable
-                    var trackObj;
-                    var artistObj;
+                        data.performance.forEach(function (performance) {
+                            artist.push(" " + performance.artist.displayName);
+                        });
 
-                    // ajax request to spotify for artist from songick
-                    $.ajax({
-                        url: 'https://api.spotify.com/v1/search',
-                        data: {
-                            q: artist.toString(),
-                            type: 'artist'
-                        },
-                        success: function (response) {
-                            if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+                        $scope.eventData.push(data);
 
-                                artistObj = response.artists.items[0];
+                        var milTime = data.start.time;
+                        var standardTime;
+                        if (milTime == null) {
+                            standardTime = 'Not specified';
+                        } else {
+                            standardTime = milToStandard(milTime);
+                        }
+                        function milToStandard(value) {
+                            if (value !== null && value !== undefined) { //If value is passed in
+                                if (value.indexOf('AM') > -1 || value.indexOf('PM') > -1) { //If time is already in standard time then don't format.
+                                    return value;
+                                }
+                                else {
+                                    if (value.length == 8) { //If value is the expected length for military time then process to standard time.
+                                        var hour = value.substring(0, 2); //Extract hour
+                                        var minutes = value.substring(3, 5); //Extract minutes
+                                        var identifier = 'AM'; //Initialize AM PM identifier
 
-                                // ajax request to spotify for top tracks of artist from previous chained ajax request
-                                $.ajax({
-                                    url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
-                                    success: function (top) {
-                                        trackObj = top.tracks[0];
-
-                                        // adds markers for shows with artists on  spotify
-                                        marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" + 
-                                            "<div class='container popup'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url + 
-                                            "'></div><div id='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
-                                            trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name+ "<br>by " + trackObj.artists[0].name 
-                                            + "</p></div></div></div>");
-                                        marker.addTo(typeLayers[data.type]);
-
+                                        if (hour == 12) { //If hour is 12 then should set AM PM identifier to PM
+                                            identifier = 'PM';
+                                        }
+                                        if (hour == 0) { //If hour is 0 then set to 12 for standard time 12 AM
+                                            hour = 12;
+                                        }
+                                        if (hour > 12) { //If hour is greater than 12 then convert to standard 12 hour format and set the AM PM identifier to PM
+                                            hour = hour - 12;
+                                            identifier = 'PM';
+                                        }
+                                        return hour + ':' + minutes + ' ' + identifier; //Return the constructed standard time
                                     }
-                                })
-                            } else {
-                                //adds marker for shows without artists on spotify
-                                marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
-                                marker.addTo(typeLayers[data.type]);                         
+                                    else { //If value is not the expected length than just return the value as is
+                                        return value;
+                                    }
+                                }
                             }
+                        };
 
+                        var ageLimit;
+                        if (data.ageRestriction == null) {
+                            ageLimit = "Not specified";
+                        } else {
+                            ageLimit = data.ageRestriction;
                         }
-                    })
-                });
-                
-                console.log($scope.eventData);
-                layerControl = L.control.layers(null, typeLayers, {collapsed: false});
-                layerControl.addTo(map);
-                map.fitBounds(bounds);
-            });
+
+                        // spotify object variable
+                        var trackObj;
+                        var artistObj;
+
+                        // ajax request to spotify for artist from songick
+                        $.ajax({
+                            url: 'https://api.spotify.com/v1/search',
+                            data: {
+                                q: artist.toString(),
+                                type: 'artist'
+                            },
+                            success: function (response) {
+                                if (response.artists.items[0] != undefined && artist[0].substring(1, artist[0].length).toString().localeCompare(response.artists.items[0].name) == 0) {
+
+                                    artistObj = response.artists.items[0];
+
+                                    // ajax request to spotify for top tracks of artist from previous chained ajax request
+                                    $.ajax({
+                                        url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
+                                        success: function (top) {
+                                            trackObj = top.tracks[0];
+
+                                            // adds markers for shows with artists on  spotify
+                                            marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" +
+                                                "<div class='container popup'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url +
+                                                "'></div><div id='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
+                                                trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name + "<br>by " + trackObj.artists[0].name
+                                                + "</p></div></div></div>");
+                                            marker.addTo(typeLayers[data.type]);
+
+                                        }
+                                    })
+                                } else {
+                                    //adds marker for shows without artists on spotify
+                                    marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
+                                    marker.addTo(typeLayers[data.type]);
+                                }
+
+                            }
+                        })
+                    });
+                    console.log($scope.eventData);
+                    layerControl = L.control.layers(null, typeLayers, {collapsed: false});
+                    layerControl.addTo(map);
+                    map.fitBounds(bounds);
+                } else {
+                    var startDate = document.getElementById("startDate").value;
+                    var endDate = document.getElementById("endDate").value;
+                    $scope.alert = true;
+                    $scope.alertTitle = "NO RESULTS FOUND.";
+                    $scope.alertMessage = "We're sorry, we could not find any concerts in " + $scope.city + " for the date range between " + startDate + " and " + endDate + ". Please try again.";
+                }
+            })
+                .error(function(response) {
+                    $scope.alert = true;
+                    $scope.alertTitle = "Something went wrong.";
+                    $scope.alertMessage = response.data + " this error occurred. Please try again.";
+                })
         }
 
         var fetchTracks = function (trackId, callback) {
@@ -332,6 +342,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.submitForm = function () {
             var query = "";
             var metroID = "";
+            $scope.alert = false;
 
 
             if ($scope.city) {
@@ -339,25 +350,33 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 // Gets the metroID using the inputted city name. A requirement from songkick's api
                 $http.jsonp("http://api.songkick.com/api/3.0/search/locations.json?apikey=" + songKickApiKey + "&query=" + $scope.city + "&per_page=1&jsoncallback=JSON_CALLBACK")
                     .success(function (response) {
-                        console.log(response.resultsPage.results.location[0].metroArea.id);
-                        metroID = response.resultsPage.results.location[0].metroArea.id;
-                        query += "&location=sk:" + metroID;
+                        if (response.resultsPage.totalEntries != 0) {
+                            metroID = response.resultsPage.results.location[0].metroArea.id;
+                            query += "&location=sk:" + metroID;
 
-                        if ($scope.dateStart) {
-                            var startDate = angular.element(document.getElementById("startDate"))[0].value;
-                            query += "&min_date=" + startDate;
+                            if ($scope.dateStart) {
+                                var startDate = angular.element(document.getElementById("startDate"))[0].value;
+                                query += "&min_date=" + startDate;
+                            }
+
+                            if ($scope.dateEnd) {
+                                var endDate = angular.element(document.getElementById("endDate"))[0].value;
+                                query += "&max_date=" + endDate;
+                            }
+
+                            query += "&per_page=100&jsoncallback=JSON_CALLBACK";
+
+                            fillMap(query);
+                        } else {
+                            $scope.alert = true;
+                            $scope.alertTitle = "CITY NOT FOUND.";
+                            $scope.alertMessage = "The city you have entered may be misspelled or does not exist in our database. Please try again.";
                         }
-
-                        if ($scope.dateEnd) {
-                            var endDate = angular.element(document.getElementById("endDate"))[0].value;
-                            query += "&max_date=" + endDate;
-                        }
-
-                        query += "&per_page=100&jsoncallback=JSON_CALLBACK";
-
-                        console.log(url + query);
-
-                        fillMap(query);
+                    })
+                    .error(function(response) {
+                        $scope.alert = true;
+                        $scope.alertTitle = "Something went wrong.";
+                        $scope.alertMessage = response.data + " this error occurred. Please try again.";
                     });
             }
 

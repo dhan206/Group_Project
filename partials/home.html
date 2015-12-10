@@ -40,7 +40,10 @@
 </div>
 
 <div id="alertArea">
-
+	<div id="alert" class="alert alert-danger fade in hidden" ng-class="{ showAlert : alert}">
+		<a href="#" class="close" ng-click="alert = false">&times;</a>
+		<strong>{{alertTitle}}</strong> <small>{{alertMessage}}</small>
+	</div>
 </div>
 
 <div id="resultsArea">
