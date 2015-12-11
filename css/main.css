@@ -23,6 +23,11 @@ body {
 	font-style: italic;
 }
 
+#resultsDiv h2 {
+	margin: 10px;
+}
+
+
 #searchForm, #alertArea {
 	padding: 1em;
 	text-align: left;
@@ -41,7 +46,7 @@ body {
 }
 
 #header {
-	min-height: 150px;
+	height: 45px;
 }
 
 .eventTitle {
@@ -91,12 +96,6 @@ body {
 	background-color: cadetblue;
 }
 
-#resultsList {
-	height: 85vh;
-	overflow: scroll;
-	padding: 0;
-	margin: 0;
-}
 
 .resultElement {
 	list-style: none;
@@ -112,6 +111,9 @@ body {
 	color: white;
 }
 
+#resultsDiv, #appDescribe {
+	display: none;
+}
 .showAlert {
 	display: block !important;
 }
@@ -123,6 +125,7 @@ body {
 		width: 25vw;
 		min-height: 90vh;
 		float: left;
+		display: block;
 	}
 
 	#map-container {
@@ -135,6 +138,7 @@ body {
 
 	#appDescribe {
 		font-size: 2em;
+		display: block;
 	}
 
 	#skLogo {
@@ -145,7 +149,19 @@ body {
 		font-size: 16px;
 	}
 
+	#resultsList {
+		height: 85vh;
+		overflow: scroll;
+		padding: 0;
+		margin: 0;
+	}
+
+	#header {
+		min-height: 150px;
+	}
 }
+
+
 .image {
 	height: 100px;
 	width: 100px;
