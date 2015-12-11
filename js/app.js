@@ -36,6 +36,12 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         map.scrollWheelZoom.disable();
 
+        // to tell when user is dragging
+        var dragging = false;
+        map.on('dragstart', function () {
+            dragging = true;
+        })
+
         // Adds a red circle marker to the user's location if available.
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
@@ -154,13 +160,21 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                                         url: 'https://api.spotify.com/v1/artists/' + artistObj.id + '/top-tracks?country=SE',
                                         success: function (top) {
                                             trackObj = top.tracks[0];
+                                            var trackName = trackObj.name;
+                                            if (trackName.length > 43) {
+                                                trackName = "" + trackName.substring(0,40) + "...";
+                                            }
+                                            var artistName = trackObj.artists[0].name;
+                                            if (artistName.length > 43) {
+                                                artistName = "" + artistName.substring(0,40) + "...";
+                                            }
 
                                             // adds markers for shows with artists on  spotify
                                             marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>" +
-                                                "<div class='container popup'><div class='row'><div class='col-xs-1'><img class='cover' src='" + trackObj.album.images[0].url +
+                                                "<br><img class='cover' src='" + trackObj.album.images[0].url +
                                                 "'></div><div id='description'><br><br id='the-break'><input type='submit' class='btn btn-primary' track-id=" +
-                                                trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackObj.name + "<br>by " + trackObj.artists[0].name
-                                                + "</p></div></div></div>");
+                                                trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackName + "<br>by " + artistName
+                                                + "</p>");
                                             marker.addTo(typeLayers[data.type]);
 
                                         }
@@ -236,6 +250,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             $scope.$apply();
         });
 
+        // gets track from spotify
         var fetchTracks = function (trackId, callback) {
             $.ajax({
                 url: 'https://api.spotify.com/v1/tracks/' + trackId,
@@ -250,6 +265,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         var audioObject = null;
         var stopped = false;
 
+        //plays music when user hits listen
         $('#map-container').on('click', '#listen', function(e) {
             var target = e.target;
             if (target.classList.contains(playingCssClass)) {
@@ -272,16 +288,16 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             }
         });
 
+        // pauses music when user clicks but doesn't drag
         $('#map-container').on('click', function (e) {
-            console.log("hey")
-
-            if (audioObject) {
+            if (audioObject && !dragging) {
                 audioObject = audioObject.pause();
             }
             var target = e.target;
-            if (target.classList.contains(playingCssClass)) {
+            if (target.classList.contains(playingCssClass && !dragging)) {
                 audioObject = audioObject.pause();
             } 
+            dragging = false;
         });
 
 
