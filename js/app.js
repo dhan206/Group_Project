@@ -194,6 +194,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         }
 
         map.on('overlayadd', function(e) {
+            var eventType = e.name;
             var points = e.layer._layers;
             var arr = Object.keys(points).map(function (key) {return points[key]});
             console.log(arr);
@@ -203,7 +204,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 for (var j = 0; j < $scope.eventData.length; j++) {
                     var lat = $scope.eventData[j].location.lat;
                     var lng = $scope.eventData[j].location.lng;
-                    if (eventLat == lat && eventLng == lng) {
+                    var type = $scope.eventData[j].type;
+                    if (eventLat == lat && eventLng == lng && eventType == type) {
                         $scope.displayData.push($scope.eventData[j]);
                     }
                 }
@@ -213,6 +215,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         });
 
         map.on('overlayremove', function(e) {
+            var eventType = e.name;
             var points = e.layer._layers;
             var arr = Object.keys(points).map(function (key) {return points[key]});
             console.log(arr);
@@ -222,7 +225,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 for (var j = 0; j < $scope.displayData.length; j++) {
                     var lat = $scope.displayData[j].location.lat;
                     var lng = $scope.displayData[j].location.lng;
-                    if (eventLat == lat && eventLng == lng) {
+                    var type = $scope.displayData[j].type;
+                    if (eventLat == lat && eventLng == lng && eventType == type) {
                         $scope.displayData.splice(j, 1);
                         j--;
                     }
