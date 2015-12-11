@@ -168,8 +168,8 @@ body {
 }
 
 .cover {
-	margin-top: 2em;
-	margin-right: 3em;
+	margin-left: 20px;
+	margin-top: 26px;
 	max-width: 100px;
     width: 100px;
     height: 100px;
@@ -204,18 +204,18 @@ body {
 }
 
 #description {
-	display: in
-	width: 300px;
-	padding-left: 135px;
+	float: right;
+	width: 155px;
+	margin-right: 1em;
 }
 
 #music-text {
 	float: none;
-	margin:5px 0;
-	padding-top: 5px;
-	padding-left: 15px;
-	padding-right: 2em;
-	text-align: left
+	margin-top: 3px;
+	padding-top: 3px;
+	padding-right: 5px;
+	padding-bottom: 20px;
+	text-align: center;
 }
 
 .container .popup {

@@ -6,16 +6,6 @@
 				<label>City</label>
 				<input type="text" class="form-control" name="city" id="city" placeholder="Search a City" ng-model="city" required autofocus>
 			</div>
-			<!--<div class="col-md-4">-->
-				<!--<label>State</label>-->
-				<!--<input type="text" class="form-control" name="state" id="state" placeholder="Search a State" ng-model="state" required>-->
-			<!--</div>-->
-			<!--<div class="col-md-4">-->
-				<!--<label>Radius (in miles)</label>-->
-				<!--<input type="number" class="form-control" min=1 name="radius" id="radius" placeholder="Radius" ng-model="radius" required>-->
-			<!--</div>-->
-		<!--</div>-->
-		<!--<div class="row">-->
 			<div class="col-md-4">
 				<label>Start Date</label>
 				<p class="input-group">
@@ -48,11 +38,11 @@
 
 <div id="resultsArea">
 	<!-- Houses the list of results-->
-	<div id="resultsDiv" ng-show="eventData.length > 0">
-		<h2>Events</h2>
+	<div id="resultsDiv" ng-show="displayData.length > 0">
+		<h2>Events Shown on Map</h2>
 		<input name="query" class="form-control" placeholder="Search" id="search" ng-model="searchQuery">
 		<ul id="resultsList">
-			<li ng-repeat="data in eventData | filter:searchQuery" class="resultElement" ng-click="locate(data)">
+			<li ng-repeat="data in displayData | filter:searchQuery track by $index" class="resultElement" ng-click="locate(data)">
 				<p>{{data.displayName}}</p>
 				<p>Event date: {{data.start.date}}</p>
 				<a href={{data.uri}} target="_blank">Link</a>
