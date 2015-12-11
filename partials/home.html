@@ -48,11 +48,11 @@
 
 <div id="resultsArea">
 	<!-- Houses the list of results-->
-	<div id="resultsDiv" ng-show="eventData.length > 0">
+	<div id="resultsDiv" ng-show="displayData.length > 0">
 		<h2>Events Shown on Map</h2>
 		<input name="query" class="form-control" placeholder="Search" id="search" ng-model="searchQuery">
 		<ul id="resultsList">
-			<li ng-repeat="data in eventData | filter:searchQuery" class="resultElement" ng-click="locate(data)">
+			<li ng-repeat="data in displayData | filter:searchQuery track by $index" class="resultElement" ng-click="locate(data)">
 				<p>{{data.displayName}}</p>
 				<p>Event date: {{data.start.date}}</p>
 				<a href={{data.uri}} target="_blank">Link</a>

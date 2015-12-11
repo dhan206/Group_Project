@@ -47,12 +47,14 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         }
 
         $scope.eventData = [];
+        $scope.displayData = [];
 
         function fillMap(param) {
             $http.jsonp(url + param)
                 .success(function (response) {
                 if(response.resultsPage.totalEntries != 0) {
                     $scope.eventData = [];
+                    $scope.displayData = [];
 
                     if (layerControl) {
                         Object.keys(typeLayers).forEach(function (layer) {
@@ -190,6 +192,45 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     $scope.alertMessage = response.data + " this error occurred. Please try again.";
                 })
         }
+
+        map.on('overlayadd', function(e) {
+            var points = e.layer._layers;
+            var arr = Object.keys(points).map(function (key) {return points[key]});
+            console.log(arr);
+            for (var i = 0; i < arr.length; i++) {
+                var eventLat = arr[i]._latlng.lat;
+                var eventLng = arr[i]._latlng.lng;
+                for (var j = 0; j < $scope.eventData.length; j++) {
+                    var lat = $scope.eventData[j].location.lat;
+                    var lng = $scope.eventData[j].location.lng;
+                    if (eventLat == lat && eventLng == lng) {
+                        $scope.displayData.push($scope.eventData[j]);
+                    }
+                }
+            }
+            console.log($scope.displayData);
+            $scope.$apply();
+        });
+
+        map.on('overlayremove', function(e) {
+            var points = e.layer._layers;
+            var arr = Object.keys(points).map(function (key) {return points[key]});
+            console.log(arr);
+            for (var i = 0; i < arr.length; i++) {
+                var eventLat = arr[i]._latlng.lat;
+                var eventLng = arr[i]._latlng.lng;
+                for (var j = 0; j < $scope.displayData.length; j++) {
+                    var lat = $scope.displayData[j].location.lat;
+                    var lng = $scope.displayData[j].location.lng;
+                    if (eventLat == lat && eventLng == lng) {
+                        $scope.displayData.splice(j, 1);
+                        j--;
+                    }
+                }
+            }
+            console.log($scope.displayData);
+            $scope.$apply();
+        });
 
         var fetchTracks = function (trackId, callback) {
             $.ajax({
