@@ -1,5 +1,5 @@
 <div id="searchForm">
-    <!-- TODO: Richard forms-->
+    <!-- Houses the search form-->
     <form name="searchForm" novalidate>
     	<div class="row">
 			<div class="col-md-4">
@@ -30,6 +30,7 @@
 </div>
 
 <div id="alertArea">
+	<!-- Houses the error message-->
 	<div id="alert" class="alert alert-danger fade in hidden" ng-class="{ showAlert : alert}">
 		<a href="#" class="close" ng-click="alert = false">&times;</a>
 		<strong>{{alertTitle}}</strong> <small>{{alertMessage}}</small>

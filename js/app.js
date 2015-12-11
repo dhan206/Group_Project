@@ -16,16 +16,19 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $urlRouterProvider.otherwise('/');
     })
 
+    //controller for homepage
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
         var map = L.map('map-container').locate({setView: true, enableHighAccuracy: true});
         var songKickApiKey = "HqtbfXIKRDQWYRLi";
+        //songkick api url
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
         var layerControl;
         var typeLayers = {};
         $scope.alert = false;
 
+        //adds tilelayer to map
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 18,
@@ -34,6 +37,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
+        //disables map zooming with scroll wheel
         map.scrollWheelZoom.disable();
 
         // to tell when user is dragging
@@ -55,6 +59,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.eventData = [];
         $scope.displayData = [];
 
+        //Fills the map with concert data
         function fillMap(param) {
             $http.jsonp(url + param)
                 .success(function (response) {
@@ -74,6 +79,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     }
 
                     var bounds = new L.LatLngBounds();
+
+                    //adds a marker to the appropriate layer for each event
                     response.resultsPage.results.event.forEach(function (data) {
 
                         var lat = data.location.lat;
@@ -188,15 +195,11 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                             }
                         })
                     });
-                    console.log($scope.eventData);
+
                     layerControl = L.control.layers(null, typeLayers, {collapsed: false});
-
-                    Object.keys(typeLayers).forEach(function (layer) {
-                        map.addLayer(typeLayers[layer]);
-                    });
-
                     layerControl.addTo(map);
                     map.fitBounds(bounds);
+
                 } else {
                     var startDate = document.getElementById("startDate").value;
                     var endDate = document.getElementById("endDate").value;
@@ -205,13 +208,14 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     $scope.alertMessage = "We're sorry, we could not find any concerts in " + $scope.city + " for the date range between " + startDate + " and " + endDate + ". Please try again.";
                 }
             })
-                .error(function(response) {
+                .error(function(response) { //error control
                     $scope.alert = true;
                     $scope.alertTitle = "Something went wrong.";
                     $scope.alertMessage = response.data + " this error occurred. Please try again.";
                 })
         }
 
+        //executed when a layer is added to the map. adds to the event list on the side bar
         map.on('overlayadd', function(e) {
             var eventType = e.name;
             var points = e.layer._layers;
@@ -233,6 +237,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             $scope.$apply();
         });
 
+        //executed when a layer is removed from the map. removes from the event list on the side bar
         map.on('overlayremove', function(e) {
             var eventType = e.name;
             var points = e.layer._layers;
@@ -411,6 +416,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
         $scope.format = "yyyy-MM-dd";
 
+        //executed when the form is submitted, passes the appropriate url to fillMap
         $scope.submitForm = function () {
             var query = "";
             var metroID = "";
@@ -445,7 +451,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                             $scope.alertMessage = "The city you have entered may be misspelled or does not exist in our database. Please try again.";
                         }
                     })
-                    .error(function(response) {
+                    .error(function(response) { //error control
                         $scope.alert = true;
                         $scope.alertTitle = "Something went wrong.";
                         $scope.alertMessage = response.data + " this error occurred. Please try again.";
