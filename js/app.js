@@ -286,6 +286,12 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 });
             });
             }
+            var elem = document.getElementById("listen");
+            if (elem.value=="LISTEN") {
+                elem.value = "PAUSE";
+            } else {
+                elem.value = "LISTEN";
+            }
         });
 
         // pauses music when user clicks but doesn't drag
