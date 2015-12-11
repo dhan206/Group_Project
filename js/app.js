@@ -37,8 +37,9 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
 
-        //disables map zooming with scroll wheel
+        //disables map zooming with scroll wheel and touch (makes it mobile friendly)
         map.scrollWheelZoom.disable();
+        map.touchZoom.disable();
 
         // to tell when user is dragging
         var dragging = false;
