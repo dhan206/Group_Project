@@ -60,6 +60,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.eventData = [];
         $scope.displayData = [];
 
+        var markerList = [];
+
         //Fills the map with concert data
         function fillMap(param) {
             $http.jsonp(url + param)
@@ -67,6 +69,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                 if(response.resultsPage.totalEntries != 0) {
                     $scope.eventData = [];
                     $scope.displayData = [];
+
+                    markerList = [];
 
                     if (layerControl) {
                         Object.keys(typeLayers).forEach(function (layer) {
@@ -184,6 +188,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                                                 trackObj.id + " id='listen' value='LISTEN'><p id='music-text'>" + trackName + "<br>by " + artistName
                                                 + "</p>");
                                             marker.addTo(typeLayers[data.type]);
+                                            markerList.push(marker);
 
                                         }
                                     })
@@ -191,8 +196,9 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                                     //adds marker for shows without artists on spotify
                                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                                     marker.addTo(typeLayers[data.type]);
+                                    markerList.push(marker);
                                 }
-
+                                console.log(markerList);
                             }
                         })
                     });
@@ -317,7 +323,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             dragging = false;
         });
 
-
+        // locates an event on the map when clicked from the event bar
         $scope.locate = function(data) {
 
             var artist = [];
@@ -371,16 +377,17 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
             } else {
                 ageLimit = data.ageRestriction;
             }
-            var popup = L.popup()
-                .setLatLng(L.latLng(data.location.lat, data.location.lng))
-                .setContent("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>")
-                .openOn(map);
-            console.log(data);
-
-
+            var displayName = data.displayName;
+            for (var i = 0; i < markerList.length; i++) {
+                var markerDisplayName = markerList[i]._popup._content;
+                console.log(markerDisplayName);
+                if (markerDisplayName.indexOf(displayName) > -1) {
+                    markerList[i].openPopup();
+                }
+            }
         };
 
-        //TODO: MAKE SEPARATE HANDLERS FOR THE 2 DATEPICKERS, MAKE IT LOOK PRETTY, SELECT ONE CHECKBOX DISABLES OTHER 
+        //defines scope variables for the datepickers
         $scope.today = new Date();
         $scope.dateStart = new Date();
         $scope.dateEnd = new Date();
@@ -400,21 +407,25 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.today = mm + '/' + dd + '/' + yyyy;
         console.log($scope.today);
 
+        // event for opening the datepickers
         $scope.open = function ($event) {
             $scope.status.isOpen = true;
             console.log($scope.dateStart);
             console.log($scope.dateEnd);
         };
 
+        // sets the format option for the year
         $scope.dateOptions = {
             formatYear: 'yy',
             startingDay: 1
         };
 
+        // sets the initial state of the datepickers to be not open
         $scope.status = {
             opened: false
         };
 
+        // sets the date format 
         $scope.format = "yyyy-MM-dd";
 
         //executed when the form is submitted, passes the appropriate url to fillMap
