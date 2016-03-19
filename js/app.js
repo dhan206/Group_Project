@@ -207,8 +207,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     layerControl.addTo(map);
 
                     Object.keys(typeLayers).forEach(function(layer) {
- -                        map.addLayer(typeLayers[layer]);
- -                  });
+                        map.addLayer(typeLayers[layer]);
+                    });
 
                     map.fitBounds(bounds);
 
