@@ -203,8 +203,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         })
                     });
 
-                    layerControl = L.control.layers(typeLayers, typeLayers, {collapsed: false});
-                    layerControl.addTo(map);
+                    layerControl = L.control.layers(null, typeLayers).addTo(map);
                     map.fitBounds(bounds);
 
                 } else {
