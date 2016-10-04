@@ -60,12 +60,16 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         $scope.displayData = [];
 
         var markerList = [];
+        var totalCount = 0;
 
         //Fills the map with concert data
         function fillMap(param) {
             $http.jsonp(url + param)
                 .success(function (response) {
                 if(response.resultsPage.totalEntries != 0) {
+                    var currentCount = 0;
+                    totalCount = response.resultsPage.totalEntries;
+                    console.log(totalCount);
                     $scope.eventData = [];
                     $scope.displayData = [];
 
@@ -191,14 +195,17 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                                         }
                                     })
-                                $(".leaflet-control-layers-selector").click();    
                                 } else {
                                     //adds marker for shows without artists on spotify
                                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                                     marker.addTo(typeLayers[data.type]);
                                     markerList.push(marker);
                                 }
-                                
+                                currentCount++;
+                                console.log(currentCount);
+                                if (currentCount >= totalCount) {
+                                    $(".leaflet-control-layers-selector").click(); 
+                                }    
                             }
                         })
                     });
