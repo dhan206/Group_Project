@@ -20,7 +20,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').locate({setView: true, enableHighAccuracy: true});
+        var map = L.map('map-container').setView([30, -35], 3);;
         var songKickApiKey = "HqtbfXIKRDQWYRLi";
         //songkick api url
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
@@ -32,7 +32,6 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw", {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 18,
-            minZoom: 8,
             id: "mapbox.emerald",
             accessToken: "pk.eyJ1IjoiZGhhbjIwNiIsImEiOiJjaWZzeWE4c2QwZDAzdHRseWRkMXR2b2Y5In0.Gbh1YncNoaD5W4zylMfNTw"
         }).addTo(map);
@@ -48,14 +47,14 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
         })
 
         // Adds a red circle marker to the user's location if available.
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var userLocation = L.circleMarker([position.coords.latitude, position.coords.longitude], {color: "red", fillColor: "red", opacity: 1, fillOpacity: .4});
-                userLocation.setRadius(4);
-                userLocation.bindPopup("<h6>You are here.</h6>");
-                userLocation.addTo(map);
-            });
-        }
+        // if (navigator.geolocation) {
+        //     navigator.geolocation.getCurrentPosition(function (position) {
+        //         var userLocation = L.circleMarker([position.coords.latitude, position.coords.longitude], {color: "red", fillColor: "red", opacity: 1, fillOpacity: .4});
+        //         userLocation.setRadius(4);
+        //         userLocation.bindPopup("<h6>You are here.</h6>");
+        //         userLocation.addTo(map);
+        //     });
+        // }
 
         $scope.eventData = [];
         $scope.displayData = [];
@@ -192,13 +191,14 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
 
                                         }
                                     })
+                                $(".leaflet-control-layers-selector").click();    
                                 } else {
                                     //adds marker for shows without artists on spotify
                                     marker.bindPopup("<p class='eventTitle'>" + data.displayName + "</p> <strong>Artist(s):</strong> " + artist.toString() + "<br><strong>Event Date:</strong> " + data.start.date + "<br><strong>Start Time:</strong> " + standardTime + "<br><strong> Age Restriction:</strong> " + ageLimit + "<br> <strong>Venue Name:</strong> " + data.venue.displayName + "<br><a href='https://maps.google.com?daddr=" + lat + "," + lon + "'target='_blank'>Get directions!</a>" + "<br><a href='" + data.uri + "'target='_blank'>Link to event page</a>");
                                     marker.addTo(typeLayers[data.type]);
                                     markerList.push(marker);
                                 }
-                                console.log(markerList);
+                                
                             }
                         })
                     });
@@ -206,7 +206,6 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     layerControl = L.control.layers(null, typeLayers, {collapsed: false});
                     layerControl.addTo(map);
                     map.fitBounds(bounds);
-
                 } else {
                     var startDate = document.getElementById("startDate").value;
                     var endDate = document.getElementById("endDate").value;
@@ -220,6 +219,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     $scope.alertTitle = "Something went wrong.";
                     $scope.alertMessage = response.data + " this error occurred. Please try again.";
                 })
+
         }
 
         //executed when a layer is added to the map. adds to the event list on the side bar
@@ -235,12 +235,12 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                     var lat = $scope.eventData[j].location.lat;
                     var lng = $scope.eventData[j].location.lng;
                     var type = $scope.eventData[j].type;
-                    if (eventLat == lat && eventLng == lng && eventType == type) {
+                    if (eventLat == lat && eventLng == lng) {
                         $scope.displayData.push($scope.eventData[j]);
                     }
                 }
             }
-            console.log($scope.displayData);
+            console.log($scope.displayData + "its kai!");
             $scope.$apply();
         });
 
@@ -457,6 +457,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                             query += "&per_page=100&jsoncallback=JSON_CALLBACK";
 
                             fillMap(query);
+
                         } else {
                             $scope.alert = true;
                             $scope.alertTitle = "CITY NOT FOUND.";
@@ -469,6 +470,8 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
                         $scope.alertMessage = response.data + " this error occurred. Please try again.";
                     });
             }
+                
+
 
         }
     }])
