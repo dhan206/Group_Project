@@ -20,7 +20,7 @@ angular.module("EventFinderApp", ['ngSanitize', 'ui.router', 'ui.bootstrap'])
     .controller("HomeCtrl", ["$scope", "$http", function($scope, $http) {
 
         //the map
-        var map = L.map('map-container').setView([30, -35], 3);;
+        var map = L.map('map-container').setView([39, -98], 4);;
         var songKickApiKey = "HqtbfXIKRDQWYRLi";
         //songkick api url
         var url = "http://api.songkick.com/api/3.0/events.json?apikey=" + songKickApiKey;
